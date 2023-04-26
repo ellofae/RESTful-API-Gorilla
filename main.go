@@ -20,6 +20,14 @@ func main() {
 	getRouter := sm.Methods(http.MethodGet).Subrouter()
 	getRouter.HandleFunc("/", ph.GetProducts)
 
+	postRouter := sm.Methods(http.MethodPost).Subrouter()
+	postRouter.HandleFunc("/", ph.AddProducts)
+	postRouter.Use(ph.MiddlewareValidationForDatatransfer)
+
+	putRouter := sm.Methods(http.MethodPut).Subrouter()
+	putRouter.HandleFunc("/{id:[0-9]+}", ph.UpdateData)
+	putRouter.Use(ph.MiddlewareValidationForDatatransfer)
+
 	srv := &http.Server{
 		Addr:         ":9090",
 		Handler:      sm,
