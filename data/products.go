@@ -4,19 +4,63 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"regexp"
 	"time"
+
+	"github.com/go-playground/validator"
 )
 
 type Product struct {
 	ID          int     `json:"id"`
-	Title       string  `json:"title"`
-	Description string  `json:"description"`
-	Price       float32 `json:"price"`
-	SKU         string  `json:"sku"`
+	Title       string  `json:"title" validate:"required,title"`
+	Description string  `json:"description" validate:"required,description"`
+	Price       float32 `json:"price" validate:"gt=0"`
+	SKU         string  `json:"sku" validate:"required,sku"`
 	CreatedOn   string  `json:"-"`
 	UpdatedOn   string  `json:"-"`
 	DeletedOn   string  `json:"-"`
 }
+
+// Validation
+func (p *Product) Validate() error {
+	validate := validator.New()
+	validate.RegisterValidation("sku", validateSKU)
+	validate.RegisterValidation("title", validateTitle)
+	validate.RegisterValidation("description", validateDescription)
+	return validate.Struct(p)
+}
+
+func validateSKU(fl validator.FieldLevel) bool {
+	re := regexp.MustCompile("[a-z]+-[a-z]+-[a-z]+")
+	matches := re.FindAllString(fl.Field().String(), -1)
+
+	if len(matches) != 1 {
+		return false
+	}
+	return true
+}
+
+func validateDescription(fl validator.FieldLevel) bool {
+	re := regexp.MustCompile("[a-zA-Z0-9-]+")
+	matches := re.FindAllString(fl.Field().String(), -1)
+
+	if len(matches) == 0 {
+		return false
+	}
+	return true
+}
+
+func validateTitle(fl validator.FieldLevel) bool {
+	re := regexp.MustCompile("^[^0-9]+$")
+	matches := re.FindAllString(fl.Field().String(), -1)
+
+	if len(matches) != 1 {
+		return false
+	}
+	return true
+}
+
+//
 
 type Products []*Product
 
