@@ -6,7 +6,9 @@ ___________________________________
 
 ## HTTP методы реализованные в микросервисе:
 Микросервис использует JSON как формат обмена данными. RESTful API реализует такие основные HTTP методы, как **GET**, **POST** и **PUT*:
+
 **func (p *Products) GetProducts(rw http.ResponseWriter, r *http.Request)** - реализует HTTP метод GET, в качестве ответа возвращает пользователю список всех данных из хранилища данных.
+
 Если во время обработки данных не удалось закодировать их в формат JSON, то в качестве ответа возвращается **ошибка 500** (http.WriteHeader(http.StatusInternalServerError)).
 
 **func (p *Products) AddProducts(rw http.ResponseWriter, r *http.Request)** - реализует HTTP метод POST, во время выполенния запроса в хранилище данных добавляется новый элемент типа **Product**. Если во время декодирования данных из формата JSON произошла ошибка, то в качестве ответа возвращается **ошибка 500** (http.WriteHeader(http.StatusInternalServerError)).
