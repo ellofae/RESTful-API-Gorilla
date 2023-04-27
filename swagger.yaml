@@ -1,0 +1,116 @@
+basePath: /
+consumes:
+    - application/json
+definitions:
+    Product:
+        description: Product data type structure
+        properties:
+            description:
+                type: string
+                x-go-name: Description
+            id:
+                description: ID for the product
+                format: int64
+                minimum: 1
+                type: integer
+                x-go-name: ID
+            price:
+                format: float
+                type: number
+                x-go-name: Price
+            sku:
+                type: string
+                x-go-name: SKU
+            title:
+                type: string
+                x-go-name: Title
+        required:
+            - id
+        type: object
+        x-go-package: github.com/ellofae/RESTful-API-Gorilla/data
+info:
+    contact:
+        email: bykovskiy.sergei.dev@gmail.com
+        name: Sergei Bykovskiy
+    description: '# Documentation for Bakery API'
+    title: for Bakery API
+    version: 1.0.0
+paths:
+    /products:
+        get:
+            operationId: listProducts
+            responses:
+                "200":
+                    $ref: '#/responses/productsResponse'
+                "500":
+                    $ref: '#/responses/productsResponseError'
+            summary: Lists all products from the data storage
+            tags:
+                - products
+        post:
+            operationId: addProducts
+            responses:
+                "200":
+                    $ref: '#/responses/addData'
+                "500":
+                    $ref: '#/responses/addDataServerError'
+            summary: Adds new product in the data storage
+            tags:
+                - products
+    /products/{id}:
+        put:
+            operationId: updateProducts
+            parameters:
+                - description: The ID of the product to update in the data storage
+                  format: int64
+                  in: path
+                  name: id
+                  required: true
+                  type: integer
+                  x-go-name: ID
+            responses:
+                "200":
+                    $ref: '#/responses/updateData'
+                "400":
+                    $ref: '#/responses/updateDataBadRequest'
+                "404":
+                    $ref: '#/responses/updateDataNotFound'
+            summary: Updates an existing product in the data storage
+            tags:
+                - products
+produces:
+    - application/json
+responses:
+    addData:
+        description: AddData is a satisfied resposne to the request to add new data to the data storage
+        schema:
+            $ref: '#/definitions/Product'
+    addDataServerError:
+        description: AddDataServerError is an error resposne to the internal server error while decoding data
+        schema:
+            $ref: '#/definitions/Product'
+    productsResponse:
+        description: ProductsResponse is a satisfied response to the call of data from the data storage
+        schema:
+            items:
+                $ref: '#/definitions/Product'
+            type: array
+    productsResponseError:
+        description: ProductsResponseError is an error response to an unsatisfied request to call data from the storage
+        schema:
+            items:
+                $ref: '#/definitions/Product'
+            type: array
+    updateData:
+        description: UpdateData is a satisfied response to the call to update a product in the data storage
+        headers:
+            Body: {}
+        schema:
+            $ref: '#/definitions/Product'
+    updateDataBadRequest:
+        description: UpdateDataBadRequstWrapper is an error response the incorrect/invalid request to update the data
+    updateDataNotFound:
+        description: UpdateDataNotFound is an error response to the call to update data because of the non-existing object
+schemes:
+    - http
+swagger: "2.0"
