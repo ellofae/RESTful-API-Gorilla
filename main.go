@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/ellofae/RESTful-API-Gorilla/files"
 	"github.com/ellofae/RESTful-API-Gorilla/handlers"
 	"github.com/go-openapi/runtime/middleware"
 	gohandlers "github.com/gorilla/handlers"
@@ -38,6 +39,16 @@ func main() {
 
 	// CORS
 	ch := gohandlers.CORS(gohandlers.AllowedOrigins([]string{"*"})) // as an open-api
+
+	// Fileserver part setting
+	local, err := files.NewLocal("./filestore", 1024)
+	if err != nil {
+		return
+	}
+
+	pf := handlers.NewFilesHandler(l, local)
+	fh := sm.Methods(http.MethodPost).Subrouter()
+	fh.HandleFunc("/files/{id:[0-9]+}/{filename:[a-zA-Z]+\\.[a-z]{3}}", pf.ServeHTTP)
 
 	srv := &http.Server{
 		Addr:         ":9090",
