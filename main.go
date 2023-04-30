@@ -46,9 +46,12 @@ func main() {
 		return
 	}
 
-	pf := handlers.NewFilesHandler(l, local)
-	fh := sm.Methods(http.MethodPost).Subrouter()
-	fh.HandleFunc("/files/{id:[0-9]+}/{filename:[a-zA-Z]+\\.[a-z]{3}}", pf.ServeHTTP)
+	hf := handlers.NewFilesHandler(l, local)
+	fileRouterPost := sm.Methods(http.MethodPost).Subrouter()
+	fileRouterPost.HandleFunc("/files/{id:[0-9]+}/{filename:[a-zA-Z]+\\.[a-z]{3}}", hf.ServeHTTP)
+
+	fileRouterGet := sm.Methods(http.MethodGet).Subrouter()
+	fileRouterGet.Handle("/files/{id:[0-9]+}/{filename:[a-zA-Z]+\\.[a-z]{3}}", http.StripPrefix("/files/", http.FileServer(http.Dir("./filestore"))))
 
 	srv := &http.Server{
 		Addr:         ":9090",
